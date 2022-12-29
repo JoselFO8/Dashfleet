@@ -30,7 +30,7 @@ app.use(
     })
 )
 app.use(express.json())
-//app.use("/", require("./app/routes"))
+app.use("/", require("./app/routes"))
 
 // Test de inicio 
 app.get("/", (req, res) => {
