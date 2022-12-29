@@ -15,6 +15,9 @@ const OrderScheme = new mongoose.Schema(
         deliverDate: {
             type: Date
         },
+        products: {
+            type: Array
+        }
     },
     {
         versionKey: false,  // deshabilitar el __v que envia mongo por defecto 
