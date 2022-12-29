@@ -14,9 +14,9 @@ router.get('/', (req, res) => {
 });
 
 fs.readdirSync(PATH_ROUTES).filter((file) => {
-    const name = removeExtension(file) // TODO users, items, uploads
+    const name = removeExtension(file)
     if(name !== 'index') {
-        router.use(`/${name}`, require(`./${file}`)) // TODO http://localhost:3001/user
+        router.use(`/${name}`, require(`./${file}`)) 
     } 
 })
 

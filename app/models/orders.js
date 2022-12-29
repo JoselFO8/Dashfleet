@@ -23,7 +23,7 @@ const OrderScheme = new mongoose.Schema(
 )
 
 // Llamar al schema y aplicarle el plugin para que pagine // Configurar en controllers
-UserScheme.plugin(mongoosePaginate) 
+//OrderScheme.plugin(mongoosePaginate) 
 
 // al igual que en MySQL, al modelo se le debe poner nombre, en este caso 'user'
-module.exports = mongoose.model('user', UserScheme)
+module.exports = mongoose.model('order', OrderScheme)
