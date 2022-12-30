@@ -1,32 +1,31 @@
 const mongoose = require('mongoose')
-const mongoosePaginate = require('mongoose-paginate-v2')
 
 const OrderScheme = new mongoose.Schema(
     {
-        clientName: {
-            type: String
+        orderCode: {
+            type: mongoose.Types.ObjectId
+        },
+        clientId: {
+            type: mongoose.Types.ObjectId
         },
         deliveryAddress: {
             type: String,
         },
+        products: {
+            type: Array
+        },
         deliveryStatus: {
-            type: String
+            type: String,
+            enum: ['received', 'in process', 'finished']
         },
         deliverDate: {
             type: Date
         },
-        products: {
-            type: Array
-        }
     },
     {
-        versionKey: false,  // deshabilitar el __v que envia mongo por defecto 
-        timestamps: true    // guarda por defecto fecha de creacion y fecha de actualizacion
+        versionKey: false,
+        timestamps: true 
     }
 )
 
-// Llamar al schema y aplicarle el plugin para que pagine // Configurar en controllers
-//OrderScheme.plugin(mongoosePaginate) 
-
-// al igual que en MySQL, al modelo se le debe poner nombre, en este caso 'user'
 module.exports = mongoose.model('order', OrderScheme)

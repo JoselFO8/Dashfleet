@@ -1,20 +1,6 @@
-const { send } = require('express/lib/response')
-const { default: mongoose } = require('mongoose')
-const orderModel = require('../models/orders')
 const { handleHttpError } = require('../utils/handleError')
-//const { handleHttpError } = require('../utils/handleError.js')
-
-const options = {
-    page: 1,
-    limit: 10
-}
-
-/**
- * Metodo para transformar un string en un objeto (id 'en este caso') 
- */
-const parseId = (id) => {
-    return mongoose.Types.ObjectId(id)
-}
+const orderModel = require('../models/orders')
+const { default: mongoose } = require('mongoose')
 
 /**
  * Obtener DATA de todos los pedidos
@@ -23,16 +9,35 @@ const parseId = (id) => {
  */
 exports.getAllOrders = async (req, res) => {    
     try {
-        // const data = await orderModel.paginate({}, options, (error, docs) => {
-        //     res.send({
-        //         orders: docs.docs,
-        //     })
-        // })
         const data = await orderModel.find({})
         res.send(data)
     } catch (error) {
         handleHttpError(res, "ERROR_GET_ORDERS")
-        //res.status(400).send("ERROR_GET_ALL_ORDERS", error)
+    }
+}
+
+exports.ordersUser = async (req, res) => {
+    try {
+        const {orderCode} = req.body
+        const data = await orderModel.aggregate(
+            [
+                {
+                    $lookup:
+                    {
+                        from: "users",
+                        localField: "clientId",
+                        foreignField: "_id",
+                        as: "userInfo"
+                    }
+                },
+                { $unwind: "$userInfo" },
+                { $match: { _id: mongoose.Types.ObjectId(orderCode) } }
+            ]
+        )
+        res.send(data)
+    } catch (error) {
+        console.log(error);
+        handleHttpError(res, "ERROR_GET_ORDER_USER")
     }
 }
 
@@ -47,8 +52,7 @@ exports.getOrderByID = async (req, res) => {
         const data = await orderModel.findById(id)
         res.send({Order: data})    
     } catch (error) {
-        //handleHttpError(res, "ERROR_GET_ORDERS_BY_ID")
-        res.status(400).send("ERROR_GET_ORDERS_BY_ID", error)
+        handleHttpError(res, "ERROR_GET_ORDERS_BY_ID")
     }    
 }
 
@@ -60,14 +64,10 @@ exports.getOrderByID = async (req, res) => {
 exports.createOrder = async (req, res) => {
     try {
         const dataOrder = req.body
+        dataOrder['orderCode'] = new mongoose.Types.ObjectId()
         const data = await orderModel.create(dataOrder)
-        console.log("Prueba", data, dataOrder)
-        res.send({data})  
+        res.send(data)
     } catch (error) {
         handleHttpError(res, "ERROR_CREATE_ORDER")
-        //res.status(400).send("ERROR_CREATE_ORDER", error)
     }
 }
-
-
-
