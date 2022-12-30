@@ -3,6 +3,8 @@ const { getAllUsers, getUserByID, createUser } = require("../controllers/users")
 const { ValidatorInserData } = require('../validators/users')
 const router = express.Router()
 
+// router.get("/user-order", validateUserInOrder)
+
 /**
  * Obtener todos los usuarios
  * Route> /user

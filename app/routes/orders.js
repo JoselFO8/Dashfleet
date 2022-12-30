@@ -1,12 +1,19 @@
 const express = require('express')
-const {getAllOrders, getOrderByID, createOrder, ordersUser} = require("../controllers/orders")
+const {getAllOrders, getOrderByID, createOrder, ordersUser, validateUserInOrder} = require("../controllers/orders")
 const { ValidatorInserData } = require('../validators/orders')
 const router = express.Router()
 
 /**
- * 
+ * Obtener pedido con informacion del usuario
+ * Route> /order/order-user
  */
-router.get("/prueba", ordersUser)
+router.get("/order-user", ordersUser)
+
+/**
+ * Validar si existe un pedido con el documento del usuario
+ * Route> /order/order-user
+ */
+router.get("/validate-user-order", validateUserInOrder)
 
 /**
  * Obtener todos los pedidos

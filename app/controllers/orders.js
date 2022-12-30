@@ -1,6 +1,7 @@
 const { handleHttpError } = require('../utils/handleError')
-const orderModel = require('../models/orders')
 const { default: mongoose } = require('mongoose')
+const orderModel = require('../models/orders')
+const userModel = require('../models/user')
 
 /**
  * Obtener DATA de todos los pedidos
@@ -16,6 +17,12 @@ exports.getAllOrders = async (req, res) => {
     }
 }
 
+/**
+ * Obtener un pedido con informacion de usuario
+ * Pasar por body el codigo de pedido
+ * @param {*} req 
+ * @param {*} res 
+ */
 exports.ordersUser = async (req, res) => {
     try {
         const {orderCode} = req.body
@@ -35,6 +42,45 @@ exports.ordersUser = async (req, res) => {
             ]
         )
         res.send(data)
+    } catch (error) {
+        console.log(error);
+        handleHttpError(res, "ERROR_GET_ORDER_USER")
+    }
+}
+
+/**
+ * Validar si el numero pedido coincide con el usuario
+ * Pasar por body codigo de pedido, tipo de documento y numero de documento  
+ * @param {*} req 
+ * @param {*} res 
+ */
+exports.validateUserInOrder = async (req, res) => {
+    try {
+        const {orderCode, documentType, documentNumber} = req.body
+        const idUser = await userModel.findOne({documentType, documentNumber})
+        const data = await orderModel.aggregate(
+            [
+                {
+                    $lookup:
+                    {
+                        from: "users",
+                        localField: "clientId",
+                        foreignField: "_id",
+                        as: "userInfo"
+                    }
+                },
+                { $unwind: "$userInfo" },
+                { $match: { _id: mongoose.Types.ObjectId(orderCode), clientId: mongoose.Types.ObjectId(idUser._id) } }
+            ]
+        )
+        if(idUser && data) {
+            if(data.length > 0) {
+                res.send(true)
+            }
+            else {
+                throw new Error('NOT_FOUND')
+            }
+        }
     } catch (error) {
         console.log(error);
         handleHttpError(res, "ERROR_GET_ORDER_USER")
